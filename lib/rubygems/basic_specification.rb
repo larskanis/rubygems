@@ -265,27 +265,25 @@ class Gem::BasicSpecification
 
   def matches_for_glob glob # TODO: rename?
     # TODO: do we need these?? Kill it
-    glob = File.join(self.lib_dirs_glob, glob)
-
-    Dir[glob].map { |f| f.untaint } # FIX our tests are broken, run w/ SAFE=1
+    self.lib_dirs.flat_map do |lib_dir|
+      base_dir = File.join(self.full_gem_path, lib_dir)
+      Dir.glob(glob, base: base_dir).map do |f|
+        File.join(base_dir, f).untaint # FIX our tests are broken, run w/ SAFE=1
+      end
+    end
   end
 
   ##
-  # Returns a string usable in Dir.glob to match all requirable paths
-  # for this spec.
+  # Returns an array with all requirable paths for this spec.
 
-  def lib_dirs_glob
+  def lib_dirs
     dirs = if self.raw_require_paths
-             if self.raw_require_paths.size > 1 then
-               "{#{self.raw_require_paths.join(',')}}"
-             else
-               self.raw_require_paths.first
-             end
-           else
-            "lib" # default value for require_paths for bundler/inline
-           end
+      self.raw_require_paths
+    else
+      ["lib"] # default value for require_paths for bundler/inline
+    end
 
-    "#{self.full_gem_path}/#{dirs}".dup.untaint
+    dirs.map{|d| d.dup.untaint }
   end
 
   ##

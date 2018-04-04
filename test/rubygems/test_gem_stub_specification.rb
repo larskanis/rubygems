@@ -92,13 +92,13 @@ class TestStubSpecification < Gem::TestCase
   def test_lib_dirs_glob
     stub = stub_without_extension
 
-    assert_equal File.join(stub.full_gem_path, 'lib'), stub.lib_dirs_glob
+    assert_equal ['lib'], stub.lib_dirs
   end
 
   def test_lib_dirs_glob_with_extension
     stub = stub_with_extension
 
-    assert_equal File.join(stub.full_gem_path, 'lib'), stub.lib_dirs_glob
+    assert_equal ['lib'], stub.lib_dirs
   end
 
   def test_matches_for_glob

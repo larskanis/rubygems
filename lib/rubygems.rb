@@ -1120,7 +1120,8 @@ An Array (#{env.inspect}) was passed in from #{caller[3]}
 
     files = []
     $LOAD_PATH.each do |load_path|
-      globbed = Dir["#{File.expand_path path, load_path}#{Gem.suffix_pattern}"]
+      base_dir = File.expand_path(path, load_path)
+      globbed = Dir.glob(Gem.suffix_pattern, base: base_dir).map { |f| File.join(base_dir, f) }
 
       globbed.each do |load_path_file|
         files << load_path_file if File.file?(load_path_file.untaint)
